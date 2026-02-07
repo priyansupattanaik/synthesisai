@@ -58,9 +58,9 @@ export default function SynapticStream() {
             <div className="w-20 h-20 rounded-full border border-dashed border-white/10 flex items-center justify-center mb-6">
               <div className="w-3 h-3 bg-slime rounded-full animate-pulse shadow-[0_0_15px_#39ff14]" />
             </div>
-            <h2 className="text-xl font-space text-off-white mb-2">Neural Link Ready</h2>
+            <h2 className="text-xl font-space text-off-white mb-2">Ready to Assist</h2>
             <p className="text-sm text-neutral-500 font-mono max-w-xs">
-              The council awaits your query. Type below to initiate synthesis.
+              Type below to start the deliberation.
             </p>
           </motion.div>
         )}
@@ -98,7 +98,7 @@ export default function SynapticStream() {
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full bg-slime shadow-[0_0_8px_#39ff14]" />
                     <span className="text-[10px] font-mono uppercase tracking-wider text-slime">
-                      Neural Synthesis
+                      Synthesis
                     </span>
                   </div>
                   
@@ -130,12 +130,12 @@ export default function SynapticStream() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex justify-start"
+            className="flex justify-center"
           >
             <div className="flex flex-col items-center gap-3 px-6 py-4">
               <Loader />
               <span className="text-xs font-mono text-amber tracking-widest uppercase animate-pulse">
-                Synthesizing Response...
+                Thinking...
               </span>
             </div>
           </motion.div>

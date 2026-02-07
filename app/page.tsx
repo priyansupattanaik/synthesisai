@@ -3,10 +3,11 @@
 import { useEffect } from 'react';
 import Header from '@/components/Header';
 import SynapticStream from '@/components/SynapticStream';
-import NeuralInput from '@/components/NeuralInput';
+import ChatInput from '@/components/ChatInput';
 import SoundManager from '@/components/SoundManager';
 import useOrganicSound from '@/hooks/useOrganicSound';
 import { useCouncilStore } from '@/store/councilStore';
+import { ShaderAnimation } from '@/components/ui/shader-lines';
 
 export default function Home() {
   const { playConsensus } = useOrganicSound();
@@ -20,7 +21,10 @@ export default function Home() {
   }, [deliberation, isLoading, playConsensus]);
 
   return (
-    <main className="h-screen flex flex-col bg-[#030305] overflow-hidden">
+    <main className="h-[100dvh] flex flex-col overflow-hidden relative">
+      {/* Shader Background */}
+      <ShaderAnimation />
+      
       {/* Sound Manager (Background) */}
       <SoundManager />
       
@@ -28,12 +32,12 @@ export default function Home() {
       <Header />
 
       {/* Main Content - Scrollable Chat Stream */}
-      <div className="flex-1 flex flex-col pt-14 overflow-hidden">
+      <div className="flex-1 flex flex-col pt-14 overflow-hidden relative z-10">
         <SynapticStream />
       </div>
 
       {/* Sticky Input Bar */}
-      <NeuralInput />
+      <ChatInput />
     </main>
   );
 }

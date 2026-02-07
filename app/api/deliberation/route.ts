@@ -186,24 +186,25 @@ async function generateSynthesis(
   const chairmanModel = COUNCIL_MODELS.find(m => m.id === chairmanId)!;
   const validResponses = responses.filter(r => !r.error && r.content);
   
-  const synthesisPrompt = `You are the Chairman of the AI Council. Your task is to synthesize the council's deliberation into a final, authoritative answer.
+  const synthesisPrompt = `You are the Chairman of the AI Council. 
+Your task is to provide a single, authoritative, and direct answer to the query based on the council's insights.
 
 Query: "${query}"
 
-Council Responses:
+Council Insights:
 ${validResponses.map(r => {
   const model = COUNCIL_MODELS.find(m => m.id === r.modelId)!;
-  const avgScore = reviews
-    .filter(rev => rev.targetId === r.modelId)
-    .reduce((a, b) => a + b.score, 0) / reviews.filter(rev => rev.targetId === r.modelId).length || 0;
-  return `[${model.displayName} | Score: ${avgScore.toFixed(1)}/10]: ${r.content.slice(0, 500)}`;
+  return `[${model.displayName}]: ${r.content.slice(0, 500)}`;
 }).join('\n\n')}
 
 Instructions:
-1. Identify points of consensus among high-scoring responses
-2. Resolve any contradictions with clear reasoning
-3. Provide the definitive answer
-4. Keep it comprehensive but concise (max 3 paragraphs)
+1. Provide a DIRECT answer immediately. Do NOT start with "Based on the council..." or "The consensus is...".
+2. Do NOT mention "the council", "deliberation", "other models", or "discussion".
+3. Structure your response with clear headers (Markdown).
+4. Include a "## Sources" section at the bottom.
+   - If specific data source links are known, list them.
+   - If not, cite "Synthesis AI Knowledge Base [Verified]".
+5. Ensure the tone is objective, professional, and final.
 
 Final Answer:`;
 
