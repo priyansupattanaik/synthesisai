@@ -1,0 +1,34 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NEXT_USE_NETLIFY_EDGE = "true"
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[functions]
+  node_bundler = "esbuild"
+  
+[[edge_functions]]
+  function = "api/deliberation"
+  path = "/api/deliberation"
+
+[functions."api/deliberation"]
+  timeout = 300
+
+[dev]
+  command = "npm run dev"
+  port = 3000
+  targetPort = 3000
