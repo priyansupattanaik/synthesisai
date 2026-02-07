@@ -41,8 +41,8 @@ export const useCouncilStore = create<CouncilStore>()(
         let newIds;
         
         if (isActive) {
-          // Prevent disabling the last model
-          if (state.activeModelIds.length <= 1) return state;
+          // Prevent disabling below minimum of 2 active models
+          if (state.activeModelIds.length <= 2) return state;
           newIds = state.activeModelIds.filter(id => id !== modelId);
         } else {
           newIds = [...state.activeModelIds, modelId];

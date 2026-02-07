@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { CouncilMemberState } from '@/lib/types';
 import { COUNCIL_MODELS } from '@/lib/models';
 import { CouncilItem } from './CouncilItem';
-import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
+import { useCouncilStore } from '@/store/councilStore';
+import HoloSwitch from '@/components/HoloSwitch';
 
 interface CouncilListProps {
   members: CouncilMemberState[];
@@ -14,6 +15,9 @@ interface CouncilListProps {
 export function CouncilList({ members }: CouncilListProps) {
   const [mobileSelectedMember, setMobileSelectedMember] = useState<string | null>(null);
   const [desktopExpandedMembers, setDesktopExpandedMembers] = useState<Set<string>>(new Set());
+  
+  // Access global store for active state management
+  const { activeModelIds, toggleActiveModel } = useCouncilStore();
 
   const toggleDesktop = (id: string) => {
     const newSet = new Set(desktopExpandedMembers);
@@ -27,7 +31,7 @@ export function CouncilList({ members }: CouncilListProps) {
 
   const getModelConfig = (id: string) => COUNCIL_MODELS.find(m => m.id === id)!;
 
-  const activeMembers = members; // can filter if needed
+  const activeMembers = members;
 
   return (
     <>
@@ -40,6 +44,8 @@ export function CouncilList({ members }: CouncilListProps) {
               member={member}
               config={getModelConfig(member.modelId)}
               layout="mobile"
+              isActive={activeModelIds.includes(member.modelId)}
+              onToggle={() => toggleActiveModel(member.modelId)}
               onClick={() => setMobileSelectedMember(member.modelId)}
             />
           ))}
@@ -50,17 +56,21 @@ export function CouncilList({ members }: CouncilListProps) {
       <div className="hidden md:flex flex-col w-full h-full overflow-y-auto custom-scrollbar border-r border-neutral-800">
         <div className="sticky top-0 bg-background/95 backdrop-blur-sm p-4 border-b border-neutral-800 z-10 flex justify-between items-center">
              <h2 className="text-xs-meta font-bold uppercase text-neutral-400 tracking-wider">The Council</h2>
-             <span className="text-xs-meta font-mono text-neutral-600">{activeMembers.filter(m => m.status !== 'idle').length}/{activeMembers.length} ACTIVE</span>
+             <span className="text-xs-meta font-mono text-neutral-600">
+               {activeModelIds.length}/{COUNCIL_MODELS.length} ENGAGED
+             </span>
         </div>
         <div>
             {activeMembers.map(member => (
                 <CouncilItem
-                key={member.modelId}
-                member={member}
-                config={getModelConfig(member.modelId)}
-                layout="desktop"
-                isExpanded={desktopExpandedMembers.has(member.modelId)}
-                onClick={() => toggleDesktop(member.modelId)}
+                  key={member.modelId}
+                  member={member}
+                  config={getModelConfig(member.modelId)}
+                  layout="desktop"
+                  isActive={activeModelIds.includes(member.modelId)}
+                  onToggle={() => toggleActiveModel(member.modelId)}
+                  isExpanded={desktopExpandedMembers.has(member.modelId)}
+                  onClick={() => toggleDesktop(member.modelId)}
                 />
             ))}
         </div>
@@ -83,6 +93,17 @@ export function CouncilList({ members }: CouncilListProps) {
                 >
                     <X className="w-5 h-5" />
                 </button>
+             </div>
+             
+             {/* Mobile Toggle Control */}
+             <div className="p-4 flex justify-between items-center bg-neutral-900/50 border-b border-neutral-800">
+                <span className="text-xs-meta text-neutral-400">CONNECTION STATUS</span>
+                <div style={{ transform: 'scale(0.8)', transformOrigin: 'right center' }}>
+                   <HoloSwitch 
+                      checked={activeModelIds.includes(mobileSelectedMember)} 
+                      onChange={() => toggleActiveModel(mobileSelectedMember)} 
+                   />
+                </div>
              </div>
              
              <div className="p-6 text-sm-body font-mono leading-relaxed whitespace-pre-wrap pb-20">

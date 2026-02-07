@@ -3,92 +3,58 @@
 @tailwind utilities;
 
 :root {
-  /* Core Palette */
-  --bg-primary: #0C0C0C;
-  --bg-surface: #141414;
-  --border-subtle: #262626;
-  --border-focus: #525252;
+  /* Strictly Enforced Palette */
+  --void-black: #030305;
+  --deep-space: #0a0b0f;
   
-  /* Text */
-  --text-primary: #F5F5F5;
-  --text-secondary: #737373;
-  --text-accent: #E5E5E5;
+  /* Living Elements */
+  --neon-slime: #39ff14;
+  --bio-cyan: #00f5d4;
   
   /* Functional */
-  --highlight: #D4A574;
-  --error: #C75D4D;
-  --success: #5A7C5A;
-  
-  /* Model Colors */
-  --model-qwen: #8B7355;
-  --model-llama3: #6B8E9F;
-  --model-llama4: #9F8AA5;
-  --model-kimi: #A52A2A;
-  --model-gpt: #5A7C5A;
-  --model-minimax: #B8860B;
-  --model-step: #708090;
-  --model-devstral: #CD853F;
-}
-
-* {
-  box-sizing: border-box;
+  --rose-madder: #ff006e;
+  --safety-orange: #fb5607;
+  --muted-ash: #1a1b1f;
+  --off-white: #e8e8e8;
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Berkeley Mono', 'SF Mono', 'Courier New', monospace; /* Fallback stack */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--void-black);
+  color: var(--off-white);
+  /* Organic feel - no sharp selections */
+  user-select: none; 
 }
 
-/* Typography Overrides for non-mono elements if needed */
-.font-sans-simulated {
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.02em; 
-}
-
-/* Custom Scrollbar */
+/* Custom Scrollbar - Minimal/Invisible for "Void" feel */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-  border-left: 1px solid var(--border-subtle);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
-  border: 2px solid var(--bg-primary); /* Creates a padded look */
+  background: #333;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-focus);
+  background: #555;
 }
 
-/* Utilities */
-.border-sharp {
-  border-radius: 0;
-}
-
-.text-xs-meta {
-  font-size: 12px;
-  line-height: 1.1;
-}
-
-.blink {
-  animation: blink-animation 1s step-end infinite;
-}
-
-@keyframes blink-animation {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-/* Selection */
-::selection {
-  background: var(--highlight);
-  color: var(--bg-primary);
+/* Utilities for Organic Computation */
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+  }
+  
+  .backdrop-blur-organic {
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Cursor States */
+  .cursor-void { cursor: crosshair; }
+  .cursor-node { cursor: pointer; }
 }

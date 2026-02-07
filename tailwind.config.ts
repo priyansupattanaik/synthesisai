@@ -9,41 +9,62 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--bg-primary)",
-        surface: "var(--bg-surface)",
-        foreground: "var(--text-primary)",
-        neutral: {
-            800: "var(--border-subtle)",
-            600: "var(--border-focus)",
-            400: "var(--text-secondary)",
-            200: "var(--text-accent)",
-        },
-        highlight: "var(--highlight)",
-        error: "var(--error)",
-        success: "var(--success)",
-        model: {
-            qwen: "var(--model-qwen)",
-            llama3: "var(--model-llama3)",
-            llama4: "var(--model-llama4)",
-            kimi: "var(--model-kimi)",
-            gpt: "var(--model-gpt)",
-            minimax: "var(--model-minimax)",
-            step: "var(--model-step)",
-            devstral: "var(--model-devstral)",
-        }
+        void: "#030305",
+        "deep-space": "#0a0b0f",
+        slime: "#39ff14",
+        cyan: "#00f5d4",
+        amber: "#ffbe0b",
+        rose: "#ff006e",
+        amethyst: "#8338ec",
+        azure: "#3a86ff",
+        ash: "#1a1b1f",
+        "ash-hover": "#2a2b2f",
+        "off-white": "#e8e8e8",
       },
       fontFamily: {
-        mono: ['"Berkeley Mono"', '"SF Mono"', '"Courier New"', 'monospace'],
-        sans: ['"Inter"', 'sans-serif'],
+        sans: ["var(--font-space)", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
-      fontSize: {
-        'xs-meta': ['12px', '1.1'],
-        'sm-body': ['14px', '1.4'],
-        'md-head': ['18px', '1.2'],
-        'lg-disp': ['24px', '1.1'],
-      }
+      animation: {
+        "breathe": "breathe 4s ease-in-out infinite",
+        "pulse-fast": "pulse-fast 0.5s ease-in-out infinite",
+        "jitter": "jitter 0.1s linear infinite",
+        "spore-drift": "spore-drift 3s ease-out forwards",
+        "wilt": "wilt 0.5s ease-out forwards",
+      },
+      keyframes: {
+        breathe: {
+          "0%, 100%": { transform: "scale(1)", opacity: "0.8" },
+          "50%": { transform: "scale(1.05)", opacity: "1" },
+        },
+        "pulse-fast": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+        jitter: {
+          "0%": { transform: "translate(0, 0)" },
+          "25%": { transform: "translate(1px, 1px)" },
+          "50%": { transform: "translate(-1px, -1px)" },
+          "75%": { transform: "translate(-1px, 1px)" },
+          "100%": { transform: "translate(1px, -1px)" },
+        },
+        "spore-drift": {
+          "0%": { transform: "translate(0, 0) scale(1)", opacity: "1" },
+          "100%": { transform: "translate(var(--tx), var(--ty)) scale(0)", opacity: "0" },
+        },
+        wilt: {
+          "0%": { filter: "grayscale(0)", transform: "scale(1)" },
+          "100%": { filter: "grayscale(1)", transform: "scale(0.8)" },
+        }
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };
+
 export default config;

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import styles from './HoloSwitch.module.css';
 
 interface HoloSwitchProps {
@@ -9,17 +9,22 @@ interface HoloSwitchProps {
 }
 
 const HoloSwitch: React.FC<HoloSwitchProps> = ({ checked, onChange }) => {
+  // useId generates a unique ID that stays the same between server and client
+  const uniqueId = useId();
+  const inputId = `holo-toggle-${uniqueId}`;
+
   return (
-    <div className={styles.toggleContainer}>
+    // Stop propagation so clicking the switch doesn't trigger the row click
+    <div className={styles.toggleContainer} onClick={(e) => e.stopPropagation()}>
       <div className={styles.toggleWrap}>
         <input 
           className={styles.toggleInput} 
-          id="holo-toggle" 
+          id={inputId} 
           type="checkbox" 
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <label className={styles.toggleTrack} htmlFor="holo-toggle">
+        <label className={styles.toggleTrack} htmlFor={inputId}>
           <div className={styles.trackLines}>
             <div className={styles.trackLine} />
           </div>

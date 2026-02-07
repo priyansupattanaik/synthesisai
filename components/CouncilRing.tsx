@@ -1,61 +1,62 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { useCouncilStore } from '@/store/councilStore';
 import { COUNCIL_MODELS } from '@/lib/models';
-import ModelOrb from './ModelOrb';
+import ModelNode from './ModelNode';
 import ArgumentThreads from './ArgumentThreads';
+import SelectionRing from './SelectionRing';
 
 export default function CouncilRing() {
-  const { members, deliberation, isLoading, activeModelIds } = useCouncilStore();
+  const { members, deliberation, activeModelIds, toggleActiveModel } = useCouncilStore();
+  const [, setHoveredNode] = useState<string | null>(null);
+  
+  // --- ROTATION STATE ---
+  // The user can rotate the whole council. This state drives the position calculations.
+  const [rotation, setRotation] = useState(0);
   
   const radius = 280; // Distance from center
 
-
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      {/* Outer Ring Glow */}
-      <motion.div
-        className="absolute rounded-full border border-white/5"
-        style={{
-          width: radius * 2 + 60,
-          height: radius * 2 + 60,
-        }}
-        animate={{
-          boxShadow: isLoading 
-            ? ['0 0 20px rgba(0,212,255,0.1)', '0 0 40px rgba(0,212,255,0.2)', '0 0 20px rgba(0,212,255,0.1)']
-            : '0 0 20px rgba(0,212,255,0.05)',
-        }}
-        transition={{ duration: 3, repeat: Infinity }}
+      
+      {/* 1. SELECTION & ROTATION LAYER */}
+      <SelectionRing 
+        radius={radius} 
+        onRotationChange={setRotation} 
       />
 
-      {/* Main Ring */}
-      <div 
-        className="absolute rounded-full border-2 border-white/10 bg-gradient-to-b from-white/5 to-transparent"
-        style={{
-          width: radius * 2,
-          height: radius * 2,
-        }}
-      >
-        {/* Ring Segments */}
-        {COUNCIL_MODELS.filter(m => activeModelIds.includes(m.id)).map((model, index, filteredModels) => {
-          const angle = (index * 360) / filteredModels.length - 90; // Start from top
+      {/* 2. SYNAPTIC WEB (Threads) */}
+      {/* Now receives the current rotation to draw lines to correct moving points */}
+      <ArgumentThreads rotation={rotation} radius={radius} />
+
+      {/* 3. NODE LAYER */}
+      <div className="absolute inset-0 pointer-events-none">
+        {COUNCIL_MODELS.map((model, index) => {
+          // Calculate angle based on Index + Manual Rotation
+          const baseAngle = (index * 360) / COUNCIL_MODELS.length - 90; 
+          const currentAngle = baseAngle + rotation;
+
+          const memberState = members.find(m => m.modelId === model.id);
+          const isActive = activeModelIds.includes(model.id);
 
           return (
-            <ModelOrb
-              key={model.id}
-              model={model}
-              member={members.find(m => m.modelId === model.id)}
-              angle={angle}
-              radius={radius}
-              isChairman={deliberation?.chairman?.modelId === model.id}
-            />
+            <div key={model.id} className="pointer-events-auto">
+                <ModelNode
+                  model={model}
+                  member={memberState}
+                  angle={currentAngle}
+                  radius={radius}
+                  isActive={isActive}
+                  isChairman={deliberation?.chairman?.modelId === model.id}
+                  onClick={() => toggleActiveModel(model.id)}
+                  onHover={(isHovering) => setHoveredNode(isHovering ? model.id : null)}
+                />
+            </div>
           );
         })}
       </div>
 
-      {/* Argument Threads */}
-      {deliberation && <ArgumentThreads />}
     </div>
   );
 }

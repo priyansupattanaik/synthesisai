@@ -325,10 +325,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('Deliberation error:', error);
+    console.error('[Deliberation Error]:', error);
     return NextResponse.json(
-      { error: 'Deliberation failed', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { error: 'Neural Link Unstable', retry: true },
+      { status: 503 }
     );
   }
 }

@@ -46,13 +46,16 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Log full error server-side for debugging
+      console.error(`[Groq API Error] Model: ${model.id}, Status: ${response.status}`, errorData);
+      // Return sanitized error to client
       return NextResponse.json(
         { 
-          error: `Groq API error: ${errorData.error?.message || response.statusText}`,
+          error: 'Model temporarily unavailable',
           modelId: model.id,
           latency 
         },
-        { status: response.status }
+        { status: 503 }
       );
     }
 

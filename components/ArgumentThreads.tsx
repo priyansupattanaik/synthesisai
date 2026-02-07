@@ -1,86 +1,110 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useCouncilStore } from '@/store/councilStore';
 import { COUNCIL_MODELS } from '@/lib/models';
 
-export default function ArgumentThreads() {
-  const { deliberation } = useCouncilStore();
-  
-  if (!deliberation) return null;
+interface ArgumentThreadsProps {
+  rotation: number; // The current rotation of the council from CouncilRing
+  radius: number;
+}
 
-  // Calculate positions for threads
-  const radius = 280;
-  const getPosition = (index: number) => {
-    const angle = (index * 360) / COUNCIL_MODELS.length - 90;
-    const radian = (angle * Math.PI) / 180;
-    return {
-      x: Math.cos(radian) * radius,
-      y: Math.sin(radian) * radius,
-    };
-  };
+export default function ArgumentThreads({ rotation, radius }: ArgumentThreadsProps) {
+  const { deliberation, activeModelIds } = useCouncilStore();
 
-  // Find agreements and disagreements based on review scores
-  const threads: { from: number; to: number; type: 'agreement' | 'conflict'; strength: number }[] = [];
-  
-  deliberation.reviews.forEach(review => {
-    const fromIndex = COUNCIL_MODELS.findIndex(m => m.id === review.reviewerId);
-    const toIndex = COUNCIL_MODELS.findIndex(m => m.id === review.targetId);
+  // 1. Calculate the exact position of every model based on current rotation
+  const modelPositions = useMemo(() => {
+    // We must match the CouncilRing logic: 
+    // angle = (index * 360 / count) - 90 + rotation
+    const activeModels = COUNCIL_MODELS; // We use all models for indexing, but filter for drawing
     
-    if (fromIndex !== -1 && toIndex !== -1) {
-      const type = review.score >= 7 ? 'agreement' : review.score <= 4 ? 'conflict' : null;
-      if (type) {
-        threads.push({
-          from: fromIndex,
-          to: toIndex,
-          type,
-          strength: review.score / 10,
-        });
-      }
-    }
-  });
+    return activeModels.reduce((acc, model, index) => {
+      // Calculate base angle + current rotation
+      const angle = ((index * 360) / activeModels.length - 90 + rotation) * (Math.PI / 180);
+      acc[model.id] = {
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+      };
+      return acc;
+    }, {} as Record<string, { x: number; y: number }>);
+  }, [rotation, radius]);
 
-  // Limit threads to avoid clutter
-  const visibleThreads = threads.slice(0, 12);
+  if (!deliberation || !deliberation.reviews) return null;
 
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
+    <svg 
+      className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" 
+      style={{ zIndex: 0 }}
+    >
       <defs>
-        <linearGradient id="agreement-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#00ff88" stopOpacity="0.2" />
-          <stop offset="50%" stopColor="#00ff88" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#00ff88" stopOpacity="0.2" />
+        {/* Organic Gradients for Threads */}
+        <linearGradient id="grad-agreement" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#39ff14" stopOpacity="0" />
+          <stop offset="50%" stopColor="#39ff14" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#39ff14" stopOpacity="0" />
         </linearGradient>
-        <linearGradient id="conflict-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#ff3366" stopOpacity="0.2" />
-          <stop offset="50%" stopColor="#ff3366" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#ff3366" stopOpacity="0.2" />
+        <linearGradient id="grad-conflict" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#ff006e" stopOpacity="0" />
+          <stop offset="50%" stopColor="#ff006e" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#ff006e" stopOpacity="0" />
         </linearGradient>
       </defs>
-      
-      {visibleThreads.map((thread, i) => {
-        const from = getPosition(thread.from);
-        const to = getPosition(thread.to);
-        const midX = (from.x + to.x) / 2;
-        const midY = (from.y + to.y) / 2;
+
+      {deliberation.reviews.map((review, i) => {
+        // Skip if involved models are inactive
+        if (!activeModelIds.includes(review.reviewerId) || !activeModelIds.includes(review.targetId)) {
+          return null;
+        }
+
+        const start = modelPositions[review.reviewerId];
+        const end = modelPositions[review.targetId];
+
+        if (!start || !end) return null;
+
+        // Score Logic: High (>7) = Green/Agreement, Low (<5) = Red/Conflict
+        const isAgreement = review.score >= 7;
+        const isConflict = review.score <= 5;
         
-        // Curved path
-        const controlX = midX * 0.3; // Curve toward center
-        const controlY = midY * 0.3;
-        
-        const path = `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`;
-        
+        // Filter: Only draw significant threads to prevent visual noise
+        if (!isAgreement && !isConflict) return null;
+
+        const strokeColor = isAgreement ? 'url(#grad-agreement)' : 'url(#grad-conflict)';
+        const pulseColor = isAgreement ? '#39ff14' : '#ff006e';
+
+        // --- ORGANIC CURVE CALCULATION ---
+        // Instead of straight lines, we pull the curve towards the center (0,0)
+        // This creates a "gravity" effect where thoughts pass through the Void
+        const centerPull = 0.3; // How much the center attracts the line
+        const controlX = (start.x + end.x) / 2 * centerPull;
+        const controlY = (start.y + end.y) / 2 * centerPull;
+
         return (
-          <motion.path
-            key={`${thread.from}-${thread.to}-${i}`}
-            d={path}
-            fill="none"
-            stroke={thread.type === 'agreement' ? 'url(#agreement-gradient)' : 'url(#conflict-gradient)'}
-            strokeWidth={2 * thread.strength}
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.6 }}
-            transition={{ duration: 1.5, delay: i * 0.1 }}
-          />
+          <g key={`${review.reviewerId}-${review.targetId}-${i}`} className="mix-blend-screen">
+            {/* The Thread */}
+            <motion.path
+              d={`M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`}
+              fill="none"
+              stroke={strokeColor}
+              strokeWidth="1.5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
+              transition={{ duration: 1.5, delay: i * 0.05, ease: "easeOut" }}
+            />
+
+            {/* The Synaptic Pulse (Data Packet) */}
+            <circle r="2" fill={pulseColor} filter="url(#glow-blur)">
+                <animateMotion 
+                    dur={`${3 + (i % 3) * 0.5}s`} // Deterministic for hydration safety
+                    repeatCount="indefinite"
+                    // Follow the same path
+                    path={`M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`}
+                    keyPoints="0;1"
+                    keyTimes="0;1"
+                    calcMode="linear"
+                />
+            </circle>
+          </g>
         );
       })}
     </svg>
