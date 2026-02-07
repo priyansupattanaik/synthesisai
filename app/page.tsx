@@ -1,169 +1,128 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useCouncilStore } from '@/store/councilStore';
-import { Send, RotateCcw } from 'lucide-react';
-import Image from 'next/image';
-import { APP_LOGO } from '@/components/icons';
+import { Header } from '@/components/Header';
+import { QueryInput } from '@/components/QueryInput';
+import { CouncilList } from '@/components/CouncilList';
+import { SynthesisPanel } from '@/components/SynthesisPanel';
+import { Chronicle } from '@/components/Chronicle';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import CouncilRing from '@/components/CouncilRing';
-import QueryCrystal from '@/components/QueryCrystal';
-import SynthesisPanel from '@/components/SynthesisPanel';
-import ModeSelector from '@/components/ModeSelector';
-import ChronicleTimeline from '@/components/ChronicleTimeline';
-import { CouncilSkeleton } from '@/components/LoadingStates';
+import { useEffect, useState } from 'react';
 
-function DelphiChamber() {
-  const [query, setQuery] = useState('');
+function SynthesisApp() {
   const { 
     deliberation, 
+    members, 
     isLoading, 
     error, 
-    selectedMode, 
-    setMode, 
     startDeliberation, 
-    reset 
+    history,
+    loadFromHistory
   } = useCouncilStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || isLoading) return;
+  const [mobileMode, setMobileMode] = useState<'deliberation' | 'synthesis'>('deliberation');
+
+  const handleSubmit = async (query: string) => {
     await startDeliberation(query);
+    setMobileMode('deliberation'); // Switch back to see cards
   };
 
+  // Auto-switch to synthesis on mobile when complete
+  useEffect(() => {
+    if (deliberation?.status === 'complete' && !isLoading) {
+        // Optional: Auto switch e.g. setMobileMode('synthesis');
+    }
+  }, [deliberation, isLoading]);
+
   return (
-    <main className="min-h-screen bg-[#050508] relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl" />
-      </div>
+    <main className="fixed inset-0 bg-background text-foreground flex flex-col font-mono overflow-hidden">
+      {/* Custom Grid / Scanlines Overlay (Optional aesthetic touch, kept minimal) */}
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-5" 
+           style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', backgroundSize: '100px 100px' }} 
+      />
 
-      {/* Header */}
-      <header className="relative z-10 p-6 flex justify-between items-center border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <motion.div 
-            className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 overflow-hidden"
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Image 
-              src={APP_LOGO} 
-              alt="Synthesis Logo" 
-              width={24} 
-              height={24} 
-              className="w-8 h-8 object-contain"
-            />
-          </motion.div>
-          <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">SYNTHESIS</h1>
-            <p className="text-xs text-gray-400">Delphi Chamber v2.0</p>
-          </div>
-        </div>
+      <Header 
+        toggleMode={() => setMobileMode(prev => prev === 'deliberation' ? 'synthesis' : 'deliberation')}
+        currentMode={mobileMode}
+      />
 
-        <div className="flex items-center gap-4">
-          <ModeSelector selected={selectedMode} onSelect={setMode} />
-          {deliberation && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              onClick={reset}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:border-cyan-500/30 text-sm"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>New Council</span>
-            </motion.button>
-          )}
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] p-4">
+      {/* Main Layout Grid */}
+      <div className="flex-1 flex overflow-hidden relative pt-12">
         
-        {/* Query Input */}
-        <AnimatePresence mode="wait">
-          {!deliberation && !isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30, scale: 0.9 }}
-              className="w-full max-w-2xl mb-8"
-            >
-              <form onSubmit={handleSubmit} className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
-                <div className="relative glass-panel rounded-2xl p-2 flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Pose your question to the council..."
-                    className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-white placeholder-gray-500 text-lg"
-                    disabled={isLoading}
-                  />
-                  <motion.button
-                    type="submit"
-                    disabled={!query.trim() || isLoading}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/25"
-                  >
-                    <Send className="w-5 h-5" />
-                  </motion.button>
-                </div>
-              </form>
-              
-              {selectedMode === 'auto' && (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center text-xs text-gray-500 mt-4"
-                >
-                  Auto-mode uses fast path for simple queries, full council for complex ones
-                </motion.p>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Council Visualization */}
-        <div className="relative w-full max-w-5xl aspect-square max-h-[700px]">
-          <AnimatePresence mode="wait">
-            {isLoading && !deliberation ? (
-              <CouncilSkeleton />
-            ) : (
-              <>
-                <CouncilRing />
-                <QueryCrystal 
-                  query={deliberation?.query || query} 
-                  isActive={isLoading || !!deliberation} 
-                />
-              </>
-            )}
-          </AnimatePresence>
-          
-          <SynthesisPanel />
+        {/* COL 1: HISTORY (Desktop: Left 20% | Tablet: Left 30%? Mobile: Hidden) */}
+        <div className="hidden md:flex flex-col w-[30%] lg:w-[20%] border-r border-neutral-800 h-full bg-background z-10 transition-all">
+           <Chronicle 
+             history={history}
+             onSelect={(timestamp) => loadFromHistory(timestamp)}
+           />
         </div>
 
-        {/* Error Display */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-200 text-sm max-w-md text-center"
-            >
-              <p className="font-medium mb-1">Council Disruption</p>
-              <p className="text-red-300/80 text-xs">{error}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+        {/* COL 2: COUNCIL / MAIN (Desktop: 50% | Tablet: 70% | Mobile: 100%) */}
+        <div className="flex-1 flex flex-col h-full relative min-w-0 z-10">
+            
+            {/* Mobile Switcher View */}
+            <div className="flex-1 flex flex-col relative overflow-hidden">
+                {/* Mobile: Show Council List OR Synthesis based on mode */}
+                <div className={`flex-1 flex flex-col h-full w-full absolute inset-0 transition-transform duration-300 md:relative md:transform-none ${mobileMode === 'synthesis' ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}`}>
+                    
+                    {/* Desktop/Tablet: Always show Council here */}
+                    {/* Mobile: This is the 'deliberation' slide */}
+                    
+                    {/* Council List Area */}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pb-20 md:pb-0">
+                        {/* Mobile Synthesis Header (Sticky when ready) */}
+                        {deliberation && (
+                            <div className="md:hidden sticky top-0 z-20 bg-surface border-b border-neutral-800 p-2 flex justify-between items-center px-4 cursor-pointer" onClick={() => setMobileMode('synthesis')}>
+                                <span className="text-xs-meta font-bold text-highlight">CHAIRMAN PENDING</span>
+                                <span className="text-xs-meta text-neutral-400">TAP TO VIEW</span>
+                            </div>
+                        )}
 
-      {/* Chronicle Timeline */}
-      <ChronicleTimeline />
+                        <div className="p-4 md:p-0 h-full">
+                           <CouncilList members={members} />
+                           
+                           {/* Empty State */}
+                           {!deliberation && !isLoading && (
+                               <div className="flex flex-col items-center justify-center p-8 md:p-20 text-center opacity-40 mt-10 md:mt-20">
+                                   <div className="w-16 h-[1px] bg-white mb-4" />
+                                   <p className="text-sm-body text-neutral-500 mb-2">No deliberations in session.</p>
+                                   <p className="text-xs-meta text-neutral-600">Enter a query to convene the council.</p>
+                               </div>
+                           )}
+                           
+                           {/* Error State */}
+                           {error && (
+                               <div className="p-4 m-4 border border-error/50 bg-error/10 text-error text-sm-body font-mono">
+                                   COUNCIL DISRUPTED: {error}
+                               </div>
+                           )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile: Synthesis Slide */}
+                <div className={`flex-1 flex flex-col h-full w-full absolute inset-0 transition-transform duration-300 md:hidden bg-background ${mobileMode === 'synthesis' ? 'translate-x-0' : 'translate-x-full'}`}>
+                    <SynthesisPanel deliberation={deliberation} isLoading={isLoading} />
+                </div>
+            </div>
+
+            {/* Input Area (Global for this column) */}
+            <div className="z-30 w-full bg-background md:p-4 md:border-t md:border-neutral-800">
+                <QueryInput onSubmit={handleSubmit} isLoading={isLoading} />
+            </div>
+
+            {/* Tablet: Synthesis Panel Fixed Bottom (Hidden on Desktop & Mobile) */}
+            <div className="hidden md:flex lg:hidden h-[250px] border-t border-neutral-800 w-full relative z-20">
+                 <SynthesisPanel deliberation={deliberation} isLoading={isLoading} />
+            </div>
+        </div>
+
+        {/* COL 3: SYNTHESIS (Desktop: Right 30% | Tablet: Bottom | Mobile: Slide) */}
+        <div className="hidden lg:flex w-[30%] border-l border-neutral-800 h-full z-10">
+            <SynthesisPanel deliberation={deliberation} isLoading={isLoading} />
+        </div>
+
+      </div>
     </main>
   );
 }
@@ -171,7 +130,7 @@ function DelphiChamber() {
 export default function Page() {
   return (
     <ErrorBoundary>
-      <DelphiChamber />
+      <SynthesisApp />
     </ErrorBoundary>
   );
 }

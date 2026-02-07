@@ -1,128 +1,79 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { useCouncilStore } from '@/store/councilStore';
-import { Crown, Clock, Users, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { DeliberationResult } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { ChevronDown, Copy, Check } from 'lucide-react';
 
-export default function SynthesisPanel() {
-  const { deliberation, isLoading } = useCouncilStore();
-  const [isExpanded, setIsExpanded] = useState(true);
+interface SynthesisPanelProps {
+  deliberation: DeliberationResult | null;
+  isLoading?: boolean;
+}
 
-  if (!deliberation && !isLoading) return null;
+export function SynthesisPanel({ deliberation, isLoading }: SynthesisPanelProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (deliberation?.finalSynthesis) {
+      navigator.clipboard.writeText(deliberation.finalSynthesis);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+
+  if (!deliberation && !isLoading) {
+    return (
+        <div className="flex items-center justify-center h-full text-neutral-600 text-xs-meta font-mono p-8 border border-neutral-800 bg-neutral-900/20">
+            AWAITING SYNTHESIS...
+        </div>
+    );
+  }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 50 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl z-30"
-      >
-        <div className="glass-panel rounded-2xl overflow-hidden border border-white/10">
-          {/* Header */}
-          <div 
-            className="flex items-center justify-between p-4 border-b border-white/5 cursor-pointer"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <div className="flex items-center gap-3">
-              {deliberation?.chairman ? (
-                <>
-                  <div 
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: `${deliberation.chairman.color}30` }}
-                  >
-                    <Crown className="w-4 h-4" style={{ color: deliberation.chairman.color }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">
-                      Chairman {deliberation.chairman.displayName}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Score: {deliberation.chairman.averageScore}/10 • {deliberation.chairman.specialty}
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-2 text-gray-400">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Clock className="w-4 h-4" />
-                  </motion.div>
-                  <span className="text-sm">Deliberating...</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-3">
-              {deliberation && (
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <Users className="w-3 h-3" />
-                  <span>{deliberation.responses.filter(r => !r.error).length}/8</span>
-                  <span className="mx-1">•</span>
-                  <Clock className="w-3 h-3" />
-                  <span>{(deliberation.duration / 1000).toFixed(1)}s</span>
-                </div>
-              )}
-              {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-            </div>
-          </div>
-
-          {/* Content */}
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                exit={{ height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="p-4 max-h-64 overflow-y-auto">
-                  {isLoading && !deliberation?.finalSynthesis ? (
-                    <div className="space-y-2">
-                      <motion.div
-                        className="h-4 bg-white/5 rounded"
-                        animate={{ opacity: [0.3, 0.6, 0.3] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      />
-                      <motion.div
-                        className="h-4 bg-white/5 rounded w-3/4"
-                        animate={{ opacity: [0.3, 0.6, 0.3] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                      />
-                      <motion.div
-                        className="h-4 bg-white/5 rounded w-1/2"
-                        animate={{ opacity: [0.3, 0.6, 0.3] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                      />
-                    </div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="prose prose-invert prose-sm max-w-none"
-                    >
-                      <p className="text-gray-200 leading-relaxed whitespace-pre-wrap">
-                        {deliberation?.finalSynthesis || 'Awaiting synthesis...'}
-                      </p>
-                    </motion.div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Footer stats */}
-          {deliberation && (
-            <div className="px-4 py-2 bg-white/5 flex items-center justify-between text-[10px] text-gray-500">
-              <span>Rotating Meritocracy System</span>
-              <span>{new Date(deliberation.timestamp).toLocaleTimeString()}</span>
-            </div>
-          )}
+    <div className={cn("flex flex-col bg-surface border-l border-neutral-800 h-full transition-all duration-300", isCollapsed ? "h-12 overflow-hidden" : "")}>
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-surface sticky top-0 z-10">
+        <div className="flex items-center gap-2">
+            <span className="text-[11px] uppercase text-neutral-400 font-bold tracking-wider">
+                CHAIRMAN: {deliberation?.chairman?.displayName || 'PENDING...'}
+            </span>
+            {isLoading && <span className="animate-pulse text-highlight">_</span>}
         </div>
-      </motion.div>
-    </AnimatePresence>
+        <div className="flex items-center gap-2">
+            <button 
+                onClick={handleCopy} 
+                disabled={!deliberation?.finalSynthesis}
+                className="text-[10px] uppercase font-bold text-neutral-400 hover:text-white flex items-center gap-1 px-2 py-1 hover:bg-neutral-800 rounded-sm transition-colors disabled:opacity-50"
+            >
+                {isCopied ? <Check className="w-3 h-3 text-success" /> : <Copy className="w-3 h-3" />}
+                {isCopied ? 'COPIED' : 'COPY'}
+            </button>
+            <button 
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="p-1 hover:bg-neutral-800 rounded-sm transition-colors"
+            >
+                <ChevronDown className={cn("w-4 h-4 text-neutral-400 transition-transform duration-200", isCollapsed ? "" : "rotate-180")} />
+            </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-6 bg-surface custom-scrollbar">
+         {isLoading ? (
+             <div className="space-y-2 animate-pulse">
+                 <div className="h-4 bg-neutral-800 w-3/4 rounded-sm" />
+                 <div className="h-4 bg-neutral-800 w-full rounded-sm" />
+                 <div className="h-4 bg-neutral-800 w-5/6 rounded-sm" />
+             </div>
+         ) : (
+            <div className="prose prose-invert max-w-[65ch] text-base leading-relaxed text-text-primary font-sans-simulated">
+                {deliberation?.finalSynthesis || (
+                    <span className="text-neutral-500 italic">Synthesis pending...</span>
+                )}
+            </div>
+         )}
+      </div>
+    </div>
   );
 }

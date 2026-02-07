@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
   const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
   
   try {
-    const { query, mode = 'full' } = await request.json();
+    const { query, mode = 'full', activeModels } = await request.json();
     
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
       return NextResponse.json(
@@ -265,7 +265,11 @@ export async function POST(request: NextRequest) {
 
     // Full council deliberation
     // Phase 1: Parallel responses
-    const responsePromises = COUNCIL_MODELS.map(model => callModel(model, query, baseUrl));
+    const activeCouncil = activeModels && activeModels.length > 0
+      ? COUNCIL_MODELS.filter(m => activeModels.includes(m.id))
+      : COUNCIL_MODELS;
+
+    const responsePromises = activeCouncil.map(model => callModel(model, query, baseUrl));
     const responses = await Promise.all(responsePromises);
     
     const validResponses = responses.filter(r => !r.error);
@@ -281,7 +285,7 @@ export async function POST(request: NextRequest) {
     // Phase 2: Peer reviews (each model reviews 3 others to save time)
     const reviewPromises: Promise<PeerReview | null>[] = [];
     
-    for (const reviewer of COUNCIL_MODELS) {
+    for (const reviewer of activeCouncil) {
       const targets = validResponses
         .filter(r => r.modelId !== reviewer.id)
         .slice(0, 3); // Each model reviews 3 others

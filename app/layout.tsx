@@ -5,11 +5,12 @@ import './globals.css';
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'SYNTHESIS | Delphi Chamber',
-  description: 'AI Council deliberation system with rotating meritocracy',
+  title: 'SYNTHESIS',
+  description: 'AI Council Deliberation Platform',
 };
 
 export default function RootLayout({
@@ -18,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en">
+      <body className={`${inter.variable} antialiased bg-background text-foreground`}>
         {children}
       </body>
     </html>

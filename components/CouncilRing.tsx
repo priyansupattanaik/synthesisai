@@ -7,7 +7,7 @@ import ModelOrb from './ModelOrb';
 import ArgumentThreads from './ArgumentThreads';
 
 export default function CouncilRing() {
-  const { members, deliberation, isLoading } = useCouncilStore();
+  const { members, deliberation, isLoading, activeModelIds } = useCouncilStore();
   
   const radius = 280; // Distance from center
 
@@ -38,9 +38,8 @@ export default function CouncilRing() {
         }}
       >
         {/* Ring Segments */}
-        {COUNCIL_MODELS.map((model, index) => {
-          const angle = (index * 360) / COUNCIL_MODELS.length - 90; // Start from top
-
+        {COUNCIL_MODELS.filter(m => activeModelIds.includes(m.id)).map((model, index, filteredModels) => {
+          const angle = (index * 360) / filteredModels.length - 90; // Start from top
 
           return (
             <ModelOrb

@@ -8,10 +8,11 @@ interface CouncilStore {
   members: CouncilMemberState[];
   isLoading: boolean;
   error: string | null;
-  selectedMode: 'fast' | 'full' | 'auto';
+  activeModelIds: string[];
   history: DeliberationResult[];
   
-  setMode: (mode: 'fast' | 'full' | 'auto') => void;
+  toggleActiveModel: (modelId: string) => void;
+  setAllModelsActive: (active: boolean) => void;
   startDeliberation: (query: string) => Promise<void>;
   reset: () => void;
   clearHistory: () => void;
@@ -32,10 +33,27 @@ export const useCouncilStore = create<CouncilStore>()(
       members: createInitialMembers(),
       isLoading: false,
       error: null,
-      selectedMode: 'auto',
+      activeModelIds: COUNCIL_MODELS.map(m => m.id),
       history: [],
       
-      setMode: (mode) => set({ selectedMode: mode }),
+      toggleActiveModel: (modelId) => set(state => {
+        const isActive = state.activeModelIds.includes(modelId);
+        let newIds;
+        
+        if (isActive) {
+          // Prevent disabling the last model
+          if (state.activeModelIds.length <= 1) return state;
+          newIds = state.activeModelIds.filter(id => id !== modelId);
+        } else {
+          newIds = [...state.activeModelIds, modelId];
+        }
+        
+        return { activeModelIds: newIds };
+      }),
+      
+      setAllModelsActive: (active) => set({
+        activeModelIds: active ? COUNCIL_MODELS.map(m => m.id) : [COUNCIL_MODELS[0].id]
+      }),
       
       startDeliberation: async (query: string) => {
         set({ 
@@ -60,7 +78,7 @@ export const useCouncilStore = create<CouncilStore>()(
           const response = await fetch('/api/deliberation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, mode: get().selectedMode }),
+            body: JSON.stringify({ query, activeModels: get().activeModelIds }),
           });
 
           clearInterval(progressInterval);
@@ -134,7 +152,7 @@ export const useCouncilStore = create<CouncilStore>()(
     {
       name: 'synthesis-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ history: state.history, selectedMode: state.selectedMode }),
+      partialize: (state) => ({ history: state.history, activeModelIds: state.activeModelIds }),
     }
   )
 );

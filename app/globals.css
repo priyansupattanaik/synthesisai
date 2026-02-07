@@ -3,87 +3,92 @@
 @tailwind utilities;
 
 :root {
-  --void-bg: #050508;
-  --obsidian: #0a0a0f;
-  --council-ring: #1a1a2e;
-  --cyan-glow: #00d4ff;
-  --gold-chairman: #ffd700;
-  --rose-conflict: #ff3366;
-  --emerald-agreement: #00ff88;
-  --text-primary: #e0e0e0;
-  --text-secondary: #888888;
+  /* Core Palette */
+  --bg-primary: #0C0C0C;
+  --bg-surface: #141414;
+  --border-subtle: #262626;
+  --border-focus: #525252;
+  
+  /* Text */
+  --text-primary: #F5F5F5;
+  --text-secondary: #737373;
+  --text-accent: #E5E5E5;
+  
+  /* Functional */
+  --highlight: #D4A574;
+  --error: #C75D4D;
+  --success: #5A7C5A;
+  
+  /* Model Colors */
+  --model-qwen: #8B7355;
+  --model-llama3: #6B8E9F;
+  --model-llama4: #9F8AA5;
+  --model-kimi: #A52A2A;
+  --model-gpt: #5A7C5A;
+  --model-minimax: #B8860B;
+  --model-step: #708090;
+  --model-devstral: #CD853F;
 }
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  background: var(--void-bg);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
+  font-family: 'Berkeley Mono', 'SF Mono', 'Courier New', monospace; /* Fallback stack */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+/* Typography Overrides for non-mono elements if needed */
+.font-sans-simulated {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.02em; 
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--obsidian);
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-subtle);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--council-ring);
-  border-radius: 4px;
+  background: var(--border-subtle);
+  border: 2px solid var(--bg-primary); /* Creates a padded look */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--cyan-glow);
+  background: var(--border-focus);
 }
 
-/* Animations */
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+/* Utilities */
+.border-sharp {
+  border-radius: 0;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+.text-xs-meta {
+  font-size: 12px;
+  line-height: 1.1;
 }
 
-@keyframes thread-draw {
-  from { stroke-dashoffset: 1000; }
-  to { stroke-dashoffset: 0; }
+.blink {
+  animation: blink-animation 1s step-end infinite;
 }
 
-@keyframes crystal-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.6), 0 0 60px rgba(0, 212, 255, 0.3); }
+@keyframes blink-animation {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
-@keyframes typewriter {
-  from { width: 0; }
-  to { width: 100%; }
-}
-
-/* Utility classes */
-.glass-panel {
-  background: rgba(26, 26, 46, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.orb-glow {
-  box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, #fff 0%, #888 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Selection */
+::selection {
+  background: var(--highlight);
+  color: var(--bg-primary);
 }
