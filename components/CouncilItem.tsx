@@ -1,10 +1,10 @@
 "use client";
 
-import React from 'react';
+
 import { CouncilMemberState } from '@/lib/types';
 import { ModelConfig } from '@/lib/models';
 import { cn } from '@/lib/utils';
-import { ChevronDown, AlertCircle } from 'lucide-react';
+import { HiChevronDown, HiExclamationCircle } from 'react-icons/hi2';
 import HoloSwitch from './HoloSwitch';
 
 interface CouncilItemProps {
@@ -18,18 +18,18 @@ interface CouncilItemProps {
 }
 
 const MODEL_COLOR_MAP: Record<string, string> = {
-  'groq-qwen3-32b': 'bg-model-qwen text-model-qwen',
-  'groq-llama-3.1-8b': 'bg-model-llama3 text-model-llama3',
-  'groq-llama-4-scout': 'bg-model-llama4 text-model-llama4',
-  'groq-kimi-k2': 'bg-model-kimi text-model-kimi',
-  'groq-gpt-oss-120b': 'bg-model-gpt text-model-gpt',
-  'nvidia-minimax-m2.1': 'bg-model-minimax text-model-minimax',
-  'nvidia-step-3.5-flash': 'bg-model-step text-model-step',
-  'nvidia-devstral-2': 'bg-model-devstral text-model-devstral',
+  'groq-deepseek-r1': 'bg-slime text-void',
+  'groq-llama-3.1-8b': 'bg-cyan text-void',
+  'groq-llama-4-scout': 'bg-amber text-void',
+  'groq-kimi-k2': 'bg-rose text-off-white',
+  'groq-gpt-oss-120b': 'bg-slime text-void',
+  'nvidia-minimax-m2.1': 'bg-amethyst text-off-white',
+  'nvidia-step-3.5-flash': 'bg-cyan text-void',
+  'nvidia-devstral-2': 'bg-azure text-off-white',
 };
 
 const MODEL_ABBR_MAP: Record<string, string> = {
-  'groq-qwen3-32b': 'QWN',
+  'groq-deepseek-r1': 'DSK',
   'groq-llama-3.1-8b': 'L31',
   'groq-llama-4-scout': 'L32', // Updated to match Llama 3.2
   'groq-kimi-k2': 'MIX',      // Updated for Mixtral
@@ -66,7 +66,7 @@ export function CouncilItem({ member, config, layout, onClick, isExpanded, isAct
         </div>
 
         {member.status === 'error' && isActive ? (
-           <AlertCircle className="w-4 h-4 text-error" />
+           <HiExclamationCircle className="w-4 h-4 text-error" />
         ) : (
             <div className="flex-1 w-full flex items-center justify-center">
                  <div className={cn("w-full h-[1px] opacity-20 group-hover:opacity-50 transition-opacity", colorClass.split(' ')[0])} />
@@ -134,7 +134,7 @@ export function CouncilItem({ member, config, layout, onClick, isExpanded, isAct
                     </div>
                 )}
                 {isActive && (
-                  <ChevronDown className={cn("w-4 h-4 text-neutral-600 transition-transform duration-200", isExpanded ? "rotate-180" : "group-hover:text-neutral-400")} />
+                  <HiChevronDown className={cn("w-4 h-4 text-neutral-600 transition-transform duration-200", isExpanded ? "rotate-180" : "group-hover:text-neutral-400")} />
                 )}
             </div>
         </button>

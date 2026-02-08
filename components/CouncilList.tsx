@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { CouncilMemberState } from '@/lib/types';
 import { COUNCIL_MODELS } from '@/lib/models';
 import { CouncilItem } from './CouncilItem';
-import { X } from 'lucide-react';
+import { HiXMark } from 'react-icons/hi2';
 import { useCouncilStore } from '@/store/councilStore';
 import HoloSwitch from '@/components/HoloSwitch';
 
@@ -91,7 +91,7 @@ export function CouncilList({ members }: CouncilListProps) {
                   onClick={() => setMobileSelectedMember(null)}
                   className="p-2 -mr-2 text-neutral-400 hover:text-white"
                 >
-                    <X className="w-5 h-5" />
+                    <HiXMark className="w-5 h-5" />
                 </button>
              </div>
              

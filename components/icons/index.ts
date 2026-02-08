@@ -16,7 +16,7 @@ export const APP_LOGO = SynthesisLogo;
 
 export const MODEL_ICONS: Record<string, StaticImageData> = {
   // Groq Models
-  'groq-qwen3-32b': QwenIcon,
+  'groq-deepseek-r1': QwenIcon,
   'groq-llama-3.1-8b': LlamaFastIcon,
   'groq-llama-4-scout': LlamaScoutIcon,
   'groq-kimi-k2': KimiIcon,

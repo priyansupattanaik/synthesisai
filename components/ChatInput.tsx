@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cpu, Send, X, Settings2 } from 'lucide-react';
+import { HiCpuChip, HiPaperAirplane, HiXMark, HiAdjustmentsHorizontal } from 'react-icons/hi2';
 import { useCouncilStore } from '@/store/councilStore';
 import { COUNCIL_MODELS } from '@/lib/models';
 import { MODEL_ICONS } from '@/components/icons';
@@ -69,7 +69,7 @@ export default function ChatInput() {
             {/* Header */}
             <div className="flex items-center justify-between mb-3 px-1">
               <div className="flex items-center gap-2">
-                <Settings2 className="w-3.5 h-3.5 text-slime" />
+                <HiAdjustmentsHorizontal className="w-3.5 h-3.5 text-slime" />
                 <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
                   Model Configuration
                 </span>
@@ -78,7 +78,7 @@ export default function ChatInput() {
                 onClick={() => setShowConfig(false)}
                 className="p-1 text-neutral-500 hover:text-white transition-colors"
               >
-                <X className="w-3.5 h-3.5" />
+                <HiXMark className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -188,7 +188,7 @@ export default function ChatInput() {
               )}
               title="Model Settings"
             >
-              <Cpu className="w-5 h-5" />
+              <HiCpuChip className="w-5 h-5" />
             </button>
 
             {/* Text Input */}
@@ -219,7 +219,7 @@ export default function ChatInput() {
                   : "text-neutral-600 cursor-not-allowed"
               )}
             >
-              <Send className="w-5 h-5" />
+              <HiPaperAirplane className="w-5 h-5" />
             </button>
           </div>
 

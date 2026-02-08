@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Github } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa6';
 import { SynthesisLogo } from './icons';
 import { useCouncilStore } from '@/store/councilStore';
 import { cn } from '@/lib/utils';
@@ -28,9 +28,6 @@ export function Header() {
           <h1 className="text-sm font-bold tracking-widest text-white uppercase">
             Synthesis<span className="text-neutral-500">.AI</span>
           </h1>
-          <span className="text-[9px] text-neutral-600 font-mono tracking-wider hidden md:block">
-            NEURAL CHAT v3.0
-          </span>
         </div>
       </div>
 
@@ -43,7 +40,7 @@ export function Header() {
             : "bg-slime shadow-[0_0_5px_#39ff14]"
         )} />
         <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
-          {isLoading ? "DELIBERATING" : `${activeModelIds.length} NEURONS`}
+          {isLoading ? "PROCESSING" : `${activeModelIds.length} MODELS`}
         </span>
       </div>
 
@@ -55,7 +52,7 @@ export function Header() {
           rel="noopener noreferrer"
           className="text-neutral-500 hover:text-white transition-colors"
         >
-          <Github className="w-5 h-5" />
+          <FaGithub className="w-5 h-5" />
         </a>
       </div>
     </header>

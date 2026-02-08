@@ -7,6 +7,7 @@ import { DeliberationResult } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import Loader from './Loader';
 
+
 interface ChatMessage {
   type: 'user' | 'council';
   content: string;
@@ -132,6 +133,7 @@ export default function SynapticStream() {
             animate={{ opacity: 1, y: 0 }}
             className="flex justify-center"
           >
+
             <div className="flex flex-col items-center gap-3 px-6 py-4">
               <Loader />
               <span className="text-xs font-mono text-amber tracking-widest uppercase animate-pulse">

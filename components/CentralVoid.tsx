@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCouncilStore } from '@/store/councilStore';
 import { cn } from '@/lib/utils';
-import { Sparkles } from 'lucide-react';
+import { HiSparkles } from 'react-icons/hi2';
 import Loader from './Loader';
 
 export default function CentralVoid() {
@@ -100,7 +100,7 @@ export default function CentralVoid() {
                     className="max-h-[60vh] overflow-y-auto custom-scrollbar text-left pointer-events-auto p-4"
                 >
                     <div className="flex items-center gap-2 mb-4 justify-center opacity-50">
-                        <Sparkles className="w-4 h-4 text-amber" />
+                        <HiSparkles className="w-4 h-4 text-amber" />
                         <span className="text-[10px] font-mono uppercase tracking-widest text-amber">
                             Synthesis Complete
                         </span>

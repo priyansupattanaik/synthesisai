@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { DeliberationResult } from '@/lib/types';
-import { Scroll, Crown } from 'lucide-react';
+import { FaScroll, FaCrown } from 'react-icons/fa6';
 import Loader from './Loader';
 
 interface SynthesisPanelProps {
@@ -24,7 +24,7 @@ export function SynthesisPanel({ deliberation, isLoading }: SynthesisPanelProps)
     return (
       <div className="h-full flex flex-col items-center justify-center p-12 text-center opacity-30 border-l border-white/5 bg-black/20">
         <div className="w-20 h-20 border border-dashed border-white/20 rounded-full flex items-center justify-center mb-6">
-            <Scroll className="w-8 h-8" />
+            <FaScroll className="w-8 h-8" />
         </div>
         <h3 className="text-xl font-mono mb-2">Awaiting Deliberation</h3>
         <p className="text-sm font-sans text-neutral-400 max-w-xs">
@@ -50,7 +50,7 @@ export function SynthesisPanel({ deliberation, isLoading }: SynthesisPanelProps)
          <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
                 <div className="p-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-500">
-                    <Crown className="w-4 h-4" />
+                    <FaCrown className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-mono text-yellow-500 uppercase tracking-widest">Elected Chairman</span>
             </div>

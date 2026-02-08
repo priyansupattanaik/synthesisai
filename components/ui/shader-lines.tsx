@@ -1,19 +1,27 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import * as THREE from "three"
+import { 
+  WebGLRenderer, 
+  Scene, 
+  Camera, 
+  PlaneGeometry, 
+  Vector2, 
+  ShaderMaterial, 
+  Mesh 
+} from "three"
 
 export function ShaderAnimation() {
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Use a ref to store the scene context so we can clean it up
   const sceneContext = useRef<{
-    renderer: THREE.WebGLRenderer | null
+    renderer: WebGLRenderer | null
     animationId: number | null
-    scene: THREE.Scene | null
-    camera: THREE.Camera | null
-    geometry: THREE.PlaneGeometry | null
-    material: THREE.ShaderMaterial | null
+    scene: Scene | null
+    camera: Camera | null
+    geometry: PlaneGeometry | null
+    material: ShaderMaterial | null
   }>({
     renderer: null,
     animationId: null,
@@ -33,19 +41,19 @@ export function ShaderAnimation() {
     container.innerHTML = ""
 
     // Initialize camera
-    const camera = new THREE.Camera()
+    const camera = new Camera()
     camera.position.z = 1
 
     // Initialize scene
-    const scene = new THREE.Scene()
+    const scene = new Scene()
 
     // Create geometry - Use PlaneGeometry as PlaneBufferGeometry is deprecated/removed in newer Three.js versions
-    const geometry = new THREE.PlaneGeometry(2, 2)
+    const geometry = new PlaneGeometry(2, 2)
 
     // Define uniforms
     const uniforms = {
       time: { value: 1.0 },
-      resolution: { value: new THREE.Vector2() },
+      resolution: { value: new Vector2() },
     }
 
     // Vertex shader
@@ -96,19 +104,20 @@ export function ShaderAnimation() {
     `
 
     // Create material
-    const material = new THREE.ShaderMaterial({
+    const material = new ShaderMaterial({
       uniforms: uniforms,
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
     })
 
     // Create mesh and add to scene
-    const mesh = new THREE.Mesh(geometry, material)
+    const mesh = new Mesh(geometry, material)
     scene.add(mesh)
 
     // Initialize renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true }) // alpha: true for potential transparency
-    renderer.setPixelRatio(window.devicePixelRatio)
+    const renderer = new WebGLRenderer({ alpha: true }) // alpha: true for potential transparency
+    // Cap pixel ratio to 1.5 for performance on high-DPI screens
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
     container.appendChild(renderer.domElement)
 
     // Store references
@@ -136,6 +145,10 @@ export function ShaderAnimation() {
     // Animation loop
     const animate = () => {
       sceneContext.current.animationId = requestAnimationFrame(animate)
+      
+      // Skip rendering if not visible or container is missing
+      if (document.hidden || !containerRef.current) return
+
       uniforms.time.value += 0.05
       renderer.render(scene, camera)
     }

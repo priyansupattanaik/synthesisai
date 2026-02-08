@@ -2,7 +2,7 @@
 
 import React, { Component, ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { HiExclamationTriangle, HiArrowPath } from 'react-icons/hi2';
 
 interface Props {
   children: ReactNode;
@@ -51,7 +51,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 transition={{ type: 'spring', stiffness: 200 }}
                 className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6"
               >
-                <AlertTriangle className="w-10 h-10 text-red-400" />
+                <HiExclamationTriangle className="w-10 h-10 text-red-400" />
               </motion.div>
               
               <h2 className="text-2xl font-bold text-white mb-2">Council Disrupted</h2>
@@ -81,7 +81,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 px-6 py-3 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-200 mx-auto transition-colors"
               >
-                <RefreshCw className="w-4 h-4" />
+                <HiArrowPath className="w-4 h-4" />
                 <span>Reconvene Council</span>
               </motion.button>
             </div>

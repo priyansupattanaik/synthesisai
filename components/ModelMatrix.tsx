@@ -5,7 +5,7 @@ import { useCouncilStore } from '@/store/councilStore';
 import { COUNCIL_MODELS } from '@/lib/models';
 import Image from 'next/image';
 import { MODEL_ICONS } from '@/components/icons';
-import { Cpu } from 'lucide-react';
+import { HiCpuChip } from 'react-icons/hi2';
 
 export default function ModelMatrix() {
   const { activeModelIds, toggleActiveModel } = useCouncilStore();
@@ -45,7 +45,7 @@ export default function ModelMatrix() {
                    className="object-cover"
                  />
                ) : (
-                 <Cpu className="w-6 h-6 text-white" />
+                 <HiCpuChip className="w-6 h-6 text-white" />
                )}
             </div>
 

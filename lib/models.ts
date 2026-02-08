@@ -18,10 +18,10 @@ export interface ModelConfig {
 export const COUNCIL_MODELS: ModelConfig[] = [
   // GROQ MODELS
   {
-    id: 'groq-qwen3-32b',
+    id: 'groq-deepseek-r1',
     provider: 'groq',
-    displayName: 'Qwen QwQ 32B',
-    modelId: 'qwen-qwq-32b', // Updated from deprecated qwen-2.5-32b
+    displayName: 'DeepSeek R1',
+    modelId: 'deepseek-r1-distill-llama-70b',
     contextWindow: 128000,
     temperature: 0.6,
     maxTokens: 4096,

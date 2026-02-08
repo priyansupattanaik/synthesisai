@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { HiSparkles } from 'react-icons/hi2';
 
 interface QueryCrystalProps {
   query: string;
@@ -69,7 +69,7 @@ export default function QueryCrystal({ query, isActive }: QueryCrystalProps) {
               {query}
             </motion.p>
           ) : (
-            <Sparkles className="w-8 h-8 text-cyan-400 mx-auto" />
+            <HiSparkles className="w-8 h-8 text-cyan-400 mx-auto" />
           )}
         </div>
 

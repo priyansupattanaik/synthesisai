@@ -7,7 +7,12 @@ import ChatInput from '@/components/ChatInput';
 import SoundManager from '@/components/SoundManager';
 import useOrganicSound from '@/hooks/useOrganicSound';
 import { useCouncilStore } from '@/store/councilStore';
-import { ShaderAnimation } from '@/components/ui/shader-lines';
+import dynamic from 'next/dynamic';
+
+const ShaderAnimation = dynamic(
+  () => import('@/components/ui/shader-lines').then((mod) => mod.ShaderAnimation),
+  { ssr: false }
+);
 
 export default function Home() {
   const { playConsensus } = useOrganicSound();
